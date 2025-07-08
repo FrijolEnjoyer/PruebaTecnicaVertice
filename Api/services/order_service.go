@@ -45,7 +45,6 @@ func (s *ordersService) CreateOrder(userID uint, items []models.OrderProduct) (*
 		unitPrice := product.Price
 		total += unitPrice * float64(item.Quantity)
 
-		// Descontar stock
 		product.Stock -= item.Quantity
 		if err := s.productRepo.UpdateProduct(product); err != nil {
 			return nil, fmt.Errorf("failed to update stock for product ID %d", item.ProductID)

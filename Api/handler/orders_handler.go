@@ -8,7 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// DTO para crear la orden
 type CreateOrderRequest struct {
 	OrderItems []models.OrderProduct `json:"order_items"`
 }
