@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Order struct {
 	ID         uint           `gorm:"primaryKey" json:"id"`
@@ -16,4 +18,8 @@ type OrderProduct struct {
 	ProductID uint    `json:"product_id"`
 	Quantity  int     `json:"quantity"`
 	UnitPrice float64 `json:"unit_price"`
+}
+
+type CreateOrderRequest struct {
+	OrderItems []OrderProduct `json:"order_items"`
 }
