@@ -6,16 +6,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"pruebaVertice/Api/models"
-	"gorm.io/gorm"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
-
-// UserServiceMock is a mock implementation of services_user.UserService for testing
-// Only GetUserByEmail is needed here
 
 type UserServiceMock struct {
 	GetUserEmailFn func(email string) (*models.User, error)
@@ -31,7 +27,6 @@ func (m *UserServiceMock) GetUserByEmail(email string) (*models.User, error) {
 }
 
 func TestCreateOrder_Success(t *testing.T) {
-	// Setup
 	gin.SetMode(gin.TestMode)
 	mockOrder := &models.Order{ID: 1, UserID: 2, Total: 10.0}
 	ordersMock := &OrdersServiceMock{}
@@ -39,24 +34,26 @@ func TestCreateOrder_Success(t *testing.T) {
 
 	userMock := &UserServiceMock{
 		GetUserEmailFn: func(email string) (*models.User, error) {
-			return &models.User{Model: gorm.Model{ID: 2}, Email: email}, nil
+			return &models.User{ID: 2, Email: email}, nil
 		},
 	}
 	logger := logrus.New()
 	h := NewOrdersHandler(ordersMock, userMock, logger)
 
-	// Prepare request
 	items := []models.OrderProduct{{ProductID: 1, Quantity: 2, UnitPrice: 0}}
-	body, _ := json.Marshal(items)
+	reqBody := map[string]interface{}{
+		"order_items": items,
+	}
+	body, _ := json.Marshal(reqBody)
+
 	rec := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(rec)
 	c.Request, _ = http.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	c.Request.Header.Set("Content-Type", "application/json")
 	c.Set("userEmail", "user@example.com")
 
-	// Execute
 	h.CreateOrder(c)
 
-	// Assert
 	assert.Equal(t, http.StatusCreated, rec.Code)
 	var resp models.Order
 	err := json.Unmarshal(rec.Body.Bytes(), &resp)
@@ -75,6 +72,7 @@ func TestCreateOrder_BindError(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(rec)
 	c.Request, _ = http.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(`invalid json`)))
+	c.Request.Header.Set("Content-Type", "application/json")
 	c.Set("userEmail", "user@example.com")
 
 	h.CreateOrder(c)
@@ -89,10 +87,16 @@ func TestCreateOrder_Unauthorized(t *testing.T) {
 	logger := logrus.New()
 	h := NewOrdersHandler(ordersMock, userMock, logger)
 
+	items := []models.OrderProduct{{ProductID: 1, Quantity: 2, UnitPrice: 0}}
+	reqBody := map[string]interface{}{
+		"order_items": items,
+	}
+	body, _ := json.Marshal(reqBody)
+
 	rec := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(rec)
-	c.Request, _ = http.NewRequest(http.MethodPost, "/", bytes.NewReader([]byte(`[]`)))
-	// No userEmail set
+	c.Request, _ = http.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+	c.Request.Header.Set("Content-Type", "application/json")
 
 	h.CreateOrder(c)
 
@@ -107,7 +111,8 @@ func TestGetUserOrders_Success(t *testing.T) {
 
 	userMock := &UserServiceMock{
 		GetUserEmailFn: func(email string) (*models.User, error) {
-			return &models.User{Model: gorm.Model{ID: 2}, Email: email}, nil
+			return &models.User{ID: 2, Email: email}, nil
+
 		},
 	}
 	logger := logrus.New()
@@ -138,7 +143,6 @@ func TestGetUserOrders_Unauthorized(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(rec)
 	c.Request, _ = http.NewRequest(http.MethodGet, "/", nil)
-	// No userEmail set
 
 	h.GetUserOrders(c)
 
