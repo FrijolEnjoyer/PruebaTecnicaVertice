@@ -3,8 +3,6 @@ package main
 import (
 	"pruebaVertice/Api/server"
 
-	"github.com/joho/godotenv"
-
 	"github.com/sirupsen/logrus"
 
 	_ "pruebaVertice/Api/docs"
@@ -19,11 +17,11 @@ import (
 // @description Token JWT en formato Bearer. Ejemplo: "Bearer {token}"
 func main() {
 	logger := logrus.New()
-	err := godotenv.Load(".env")
+	//err := godotenv.Load(".env")
 	//err := godotenv.Load("../../.env") // Localhost
-	if err != nil {
-		logger.Fatalf("Error loading .env file: %v", err)
-	}
+	//if err != nil {
+	//	logger.Fatalf("Error loading .env file: %v", err)
+	//}
 
 	db, err := server.InitDB(logger)
 	if err != nil {
