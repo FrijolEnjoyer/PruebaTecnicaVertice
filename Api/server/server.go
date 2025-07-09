@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"os"
 	order_handler "pruebaVertice/Api/handler/order"
 	products_handler "pruebaVertice/Api/handler/products"
@@ -97,12 +96,12 @@ func (s *Server) setupRoutes() {
 }
 func InitDB(logger *logrus.Logger) (*gorm.DB, error) {
 
-	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASSWORD")
-	host := os.Getenv("DB_HOST")
-	name := os.Getenv("DB_NAME")
+	//user := os.Getenv("DB_USER")
+	//pass := os.Getenv("DB_PASSWORD")
+	//host := os.Getenv("DB_HOST")
+	//name := os.Getenv("DB_NAME")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, pass, host, name)
+	dsn := os.Getenv("MYSQL_PUBLIC_URL")
 	var db *gorm.DB
 	var err error
 
