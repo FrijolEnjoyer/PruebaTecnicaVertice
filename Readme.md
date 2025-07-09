@@ -116,6 +116,14 @@ Ahí encontrarás todas las rutas documentadas.
 
 ---
 
+## 🥪 Ejecutar Tests 
+
+Ejecuta el siguiente script:
+
+chmod +x run_tests.sh
+./run_tests.sh
+---
+
 ## 📛 Detener los Servicios
 
 ```bash
