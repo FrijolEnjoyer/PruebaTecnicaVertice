@@ -18,7 +18,7 @@ import (
 // @description Token JWT en formato Bearer. Ejemplo: "Bearer {token}"
 func main() {
 	logger := logrus.New()
-	err := godotenv.Load("../../.env") // Localhost
+	err := godotenv.Load(".env")
 	if err != nil {
 		logger.Fatalf("Error loading .env file: %v", err)
 	}
