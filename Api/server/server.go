@@ -97,11 +97,11 @@ func (s *Server) setupRoutes() {
 }
 func InitDB(logger *logrus.Logger) (*gorm.DB, error) {
 
-	user := os.Getenv("MYSQLUSER")
-	pass := os.Getenv("MYSQL_ROOT_PASSWORD")
-	host := os.Getenv("MYSQLHOST")
-	name := os.Getenv("MYSQL_DATABASE")
-	port := os.Getenv("MYSQLPORT")
+	user := os.Getenv("DB_USER")
+	pass := os.Getenv("DB_PASSWORD")
+	host := os.Getenv("DB_HOST")
+	name := os.Getenv("DB_NAME")
+	port := os.Getenv("DB_PORT")
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, pass, host, port, name)
 	var db *gorm.DB
