@@ -24,5 +24,8 @@ WORKDIR /root/
 COPY --from=builder /app/Api/cmd/server .
 COPY .env .
 
+COPY run_tests.sh .
+RUN chmod +x ./run_tests.sh
+
 EXPOSE 8080
 CMD ["./server"]
