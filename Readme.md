@@ -5,6 +5,8 @@ La API está desplegada y lista para usarse.
 
 ---
 
+## 🤓☝️ Para correr la App en local pueden cambiar de rama a for_localhost
+
 ## 🚀 API Deployada
 
 Puedes acceder al swagger de la API en el siguiente enlace:
