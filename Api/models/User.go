@@ -3,7 +3,7 @@ package models
 import "gorm.io/gorm"
 
 type User struct {
-	gorm.Model
+	gorm.Model   `json:"-" swaggerignore:"true"`
 	Username     string `gorm:"type:varchar(255);uniqueIndex" json:"username"`
 	Password     string `validate:"required,password" json:"password" bson:"password"`
 	Email        string `gorm:"type:varchar(255);uniqueIndex" json:"email" bson:"email"`
