@@ -6,12 +6,21 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/sirupsen/logrus"
+
+	_ "pruebaVertice/Api/docs"
 )
 
+// @title API de Prueba Técnica Vértice
+// @version 1.0
+// @description Esta API gestiona usuarios, productos y órdenes.
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Token JWT en formato Bearer. Ejemplo: "Bearer {token}"
 func main() {
 	logger := logrus.New()
-	//err := godotenv.Load(".env")
-	err := godotenv.Load("../../.env") // Localhost
+	err := godotenv.Load(".env")
+	//err := godotenv.Load("../../.env") // Localhost
 	if err != nil {
 		logger.Fatalf("Error loading .env file: %v", err)
 	}
