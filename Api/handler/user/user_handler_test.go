@@ -5,20 +5,20 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"pruebaVertice/Api/models"
 	"pruebaVertice/Api/dto"
+	"pruebaVertice/Api/models"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 )
 
 func TestCreateUser_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	userInput := models.User{Username: "john", Password: "pass", Email: "john@example.com"}
-	created := &models.User{Model: gorm.Model{ID: 1}, Username: "john", Email: "john@example.com"}
+	created := &models.User{ID: 1, Username: "john", Email: "john@example.com"}
+
 	serviceMock := &UserServiceMock{}
 	serviceMock.On("CreateUser", &userInput).Return(created, nil)
 	logger := logrus.New()
@@ -34,13 +34,15 @@ func TestCreateUser_Success(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, rec.Code)
 	var resp models.User
 	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
-	assert.Equal(t, *created, resp)
+	assert.Equal(t, created.ID, resp.ID)
+	assert.Equal(t, created.Username, resp.Username)
+	assert.Equal(t, created.Email, resp.Email)
 	serviceMock.AssertExpectations(t)
 }
 
 func TestGetUserByID_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	returned := &models.User{Model: gorm.Model{ID: 2}, Username: "alice", Email: "a@b.com"}
+	returned := &models.User{ID: 2, Username: "alice", Email: "a@b.com"}
 	serviceMock := &UserServiceMock{}
 	serviceMock.On("GetUserByID", "2").Return(returned, nil)
 	logger := logrus.New()
@@ -56,7 +58,9 @@ func TestGetUserByID_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 	var resp models.User
 	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
-	assert.Equal(t, *returned, resp)
+	assert.Equal(t, returned.ID, resp.ID)
+	assert.Equal(t, returned.Username, resp.Username)
+	assert.Equal(t, returned.Email, resp.Email)
 	serviceMock.AssertExpectations(t)
 }
 
@@ -77,11 +81,10 @@ func TestGetUserByID_NotFound(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 	serviceMock.AssertExpectations(t)
 }
-
 func TestUpdateUser_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	input := models.User{Username: "bob", Email: "b@c.com"}
-	updated := &models.User{Model: gorm.Model{ID: 4}, Username: "bob", Email: "b@c.com"}
+	updated := &models.User{ID: 4, Username: "bob", Email: "b@c.com"}
 	serviceMock := &UserServiceMock{}
 	serviceMock.On("UpdateUser", &input).Return(updated, nil)
 	logger := logrus.New()
@@ -97,7 +100,9 @@ func TestUpdateUser_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 	var resp models.User
 	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
-	assert.Equal(t, *updated, resp)
+	assert.Equal(t, updated.ID, resp.ID)
+	assert.Equal(t, updated.Username, resp.Username)
+	assert.Equal(t, updated.Email, resp.Email)
 	serviceMock.AssertExpectations(t)
 }
 
@@ -165,9 +170,9 @@ func TestLoginUser_Success(t *testing.T) {
 
 func TestGetLoggedInUser_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	userData := &models.User{Model: gorm.Model{ID: 7}, Username: "x", Email: "x@y"}
+	created := &models.User{ID: 1, Username: "john", Email: "john@example.com"}
 	serviceMock := &UserServiceMock{}
-	serviceMock.On("GetUserByEmail", "x@y").Return(userData, nil)
+	serviceMock.On("GetUserByEmail", "x@y").Return(created, nil)
 	logger := logrus.New()
 	h := NewUserHandler(serviceMock, logger)
 
@@ -181,7 +186,9 @@ func TestGetLoggedInUser_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 	var resp models.User
 	_ = json.Unmarshal(rec.Body.Bytes(), &resp)
-	assert.Equal(t, *userData, resp)
+	assert.Equal(t, created.ID, resp.ID)
+	assert.Equal(t, created.Username, resp.Username)
+	assert.Equal(t, created.Email, resp.Email)
 	serviceMock.AssertExpectations(t)
 }
 
