@@ -3,14 +3,21 @@ package server
 import (
 	"fmt"
 	"os"
-	"pruebaVertice/Api/handler"
+	order_handler "pruebaVertice/Api/handler/order"
+	products_handler "pruebaVertice/Api/handler/products"
+	user_handler "pruebaVertice/Api/handler/user"
 	"pruebaVertice/Api/models"
 	"pruebaVertice/Api/repo/orders_repo"
 	"pruebaVertice/Api/repo/products_repo"
 	user_repo "pruebaVertice/Api/repo/user_repo"
-	"pruebaVertice/Api/services"
+	services_order "pruebaVertice/Api/services/order"
+	services_product "pruebaVertice/Api/services/product"
+	services_user "pruebaVertice/Api/services/user"
 	"pruebaVertice/Api/utils"
 	"time"
+
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	jwtUtils "pruebaVertice/Api/utils/jwt"
 
@@ -39,26 +46,26 @@ func NewServer(db *gorm.DB, logger *logrus.Logger) *Server {
 func (s *Server) setupRoutes() {
 	hasher := utils.BcryptHasher{}
 	tokenGen := jwtUtils.JWTGenerator{}
-	userService := services.NewUserService(
+	userService := services_user.NewUserService(
 		user_repo.NewUserRepository(s.db, s.logger),
 		hasher,
 		tokenGen,
 		s.logger,
 	)
 
-	userHandler := handler.NewUserHandler(userService, s.logger)
-	productsService := services.NewProductsService(
+	userHandler := user_handler.NewUserHandler(userService, s.logger)
+	productsService := services_product.NewProductsService(
 		products_repo.NewProductsRepository(s.db, s.logger),
 		s.logger,
 	)
 
-	productsHandler := handler.NewProductsHandler(productsService, s.logger)
-	ordersService := services.NewOrdersService(
+	productsHandler := products_handler.NewProductsHandler(productsService, s.logger)
+	ordersService := services_order.NewOrdersService(
 		orders_repo.NewOrdersRepository(s.db, s.logger),
 		products_repo.NewProductsRepository(s.db, s.logger),
 		s.logger,
 	)
-	ordersHandler := handler.NewOrdersHandler(ordersService, userService, s.logger)
+	ordersHandler := order_handler.NewOrdersHandler(ordersService, userService, s.logger)
 
 	api := s.router.Group("/api")
 	{
@@ -83,7 +90,10 @@ func (s *Server) setupRoutes() {
 				orders.GET("/", ordersHandler.GetUserOrders)
 			}
 		}
+
 	}
+	s.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 }
 func InitDB(logger *logrus.Logger) (*gorm.DB, error) {
 
