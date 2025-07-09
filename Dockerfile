@@ -22,7 +22,7 @@ WORKDIR /root/
 
 # Copy built binary and .env
 COPY --from=builder /app/Api/cmd/server .
-COPY .env .
+#COPY .env .
 
 COPY run_tests.sh .
 RUN chmod +x ./run_tests.sh
