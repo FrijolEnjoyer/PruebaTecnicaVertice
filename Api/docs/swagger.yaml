@@ -1,0 +1,336 @@
+definitions:
+  pruebaVertice_Api_dto.LoginResponse:
+    properties:
+      refresh_token:
+        type: string
+      token:
+        type: string
+    type: object
+  pruebaVertice_Api_models.CreateOrderRequest:
+    properties:
+      order_items:
+        items:
+          $ref: '#/definitions/pruebaVertice_Api_models.OrderProduct'
+        type: array
+    type: object
+  pruebaVertice_Api_models.Order:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      order_items:
+        items:
+          $ref: '#/definitions/pruebaVertice_Api_models.OrderProduct'
+        type: array
+      total:
+        type: number
+      user_id:
+        type: integer
+    type: object
+  pruebaVertice_Api_models.OrderProduct:
+    properties:
+      id:
+        type: integer
+      order_id:
+        type: integer
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      unit_price:
+        type: number
+    type: object
+  pruebaVertice_Api_models.Product:
+    properties:
+      created_by:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  pruebaVertice_Api_models.User:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      refresh_token:
+        type: string
+      token:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    type: object
+info:
+  contact: {}
+  description: Esta API gestiona usuarios, productos y órdenes.
+  title: API de Prueba Técnica Vértice
+  version: "1.0"
+paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Inicia sesión de un usuario y devuelve tokens
+      parameters:
+      - description: Credenciales del usuario
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/pruebaVertice_Api_models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pruebaVertice_Api_dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login de usuario
+      tags:
+      - Users
+  /api/auth/me:
+    get:
+      description: Devuelve la información del usuario autenticado
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pruebaVertice_Api_models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener usuario logueado
+      tags:
+      - Users
+  /api/auth/orders:
+    get:
+      description: Devuelve todas las órdenes del usuario autenticado
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/pruebaVertice_Api_models.Order'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener historial de órdenes del usuario autenticado
+      tags:
+      - Orders
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva orden con los productos seleccionados
+      parameters:
+      - description: Lista de productos para la orden
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/pruebaVertice_Api_models.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/pruebaVertice_Api_models.Order'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Crear una nueva orden
+      tags:
+      - Orders
+  /api/auth/products/:
+    get:
+      description: Obtiene la lista de todos los productos registrados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/pruebaVertice_Api_models.Product'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener todos los productos
+      tags:
+      - Products
+    post:
+      consumes:
+      - application/json
+      description: Crea uno o varios productos nuevos
+      parameters:
+      - description: Productos a crear (formato key-value)
+        in: body
+        name: products
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/pruebaVertice_Api_models.Product'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Crear productos
+      tags:
+      - Products
+  /api/auth/products/{id}:
+    get:
+      description: Obtiene la información de un producto mediante su ID
+      parameters:
+      - description: ID del producto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pruebaVertice_Api_models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener un producto por ID
+      tags:
+      - Products
+  /api/auth/register/:
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo usuario en la base de datos
+      parameters:
+      - description: Datos del usuario
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/pruebaVertice_Api_models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/pruebaVertice_Api_models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Crear un usuario
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    description: 'Token JWT en formato Bearer. Ejemplo: "Bearer {token}"'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
